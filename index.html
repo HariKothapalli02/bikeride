@@ -404,11 +404,16 @@
     box-shadow: 0 0 0 4px var(--black); 
   }
 
-  /* Global active state for all buttons */
-  button:active {
+  /* Global active state for all buttons (except nav-items) */
+  button:not(.nav-item):active {
     box-shadow: 0 0 0 3px rgba(0,0,0,0.8) !important;
     transform: scale(0.97);
     transition: all 0.1s;
+  }
+
+  .nav-item:active {
+    box-shadow: none !important;
+    transform: scale(0.95);
   }
 
   .cta-arrow {
