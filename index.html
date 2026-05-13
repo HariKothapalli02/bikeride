@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>EasyFindRide – Fast & Safe Rides</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --orange: #FF5F00;
+    --orange-dark: #D94200;
+    --orange-light: #FF8A45;
+    --orange-pale: #FFF5F0;
+    --black: #0F0F0F;
+    --white: #FFFFFF;
+    --gray-bg: #F8F9FA;
+    --gray-border: rgba(0,0,0,0.06);
+    --glass: rgba(255, 255, 255, 0.85);
+    --shadow-sm: 0 4px 12px rgba(0,0,0,0.03);
+    --shadow-md: 0 10px 30px rgba(0,0,0,0.08);
+    --shadow-orange: 0 12px 30px rgba(255,95,0,0.25);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: #fdfdfd;
+    color: var(--black);
+    min-height: 100vh;
+    overflow-x: hidden;
+    /* Soft mesh background for premium feel */
+    background-image: 
+      radial-gradient(at 0% 0%, rgba(255,95,0,0.03) 0, transparent 50%), 
+      radial-gradient(at 50% 0%, rgba(255,255,255,1) 0, transparent 50%), 
+      radial-gradient(at 100% 0%, rgba(255,95,0,0.03) 0, transparent 50%);
+  }
+
+  /* ── NAVBAR ─────────────────────────── */
+  .top-nav {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: var(--white);
+    box-shadow: 0 2px 16px rgba(240,90,0,.10);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+  }
+
+  .logo {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 28px;
+    letter-spacing: 1px;
+    line-height: 1;
+    user-select: none;
+  }
+  .logo span.easy  { color: var(--orange); }
+  .logo span.find  { color: var(--black); }
+  .logo span.ride  { color: var(--orange); }
+
+  .support-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--orange-pale);
+    border: none;
+    border-radius: 50px;
+    padding: 8px 16px 8px 10px;
+    cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--orange);
+    transition: background .2s, transform .15s;
+  }
+  .support-btn:hover { background: #ffe0cc; transform: scale(1.04); }
+  .support-btn svg { flex-shrink: 0; }
+
+  /* ── HERO ────────────────────────────── */
+  .hero {
+    position: relative;
+    padding: 30px 24px 20px;
+    overflow: hidden;
+    background: var(--white);
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    top: -150px;
+    right: -150px;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(255,95,0,0.1) 0%, transparent 70%);
+    z-index: 0;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,95,0,0.08);
+    color: var(--orange-dark);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    padding: 10px 20px;
+    border-radius: 100px;
+    margin-bottom: 12px;
+    position: relative;
+    z-index: 1;
+    border: 1px solid rgba(255,95,0,0.1);
+    backdrop-filter: blur(5px);
+  }
+
+  .hero-layout {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    z-index: 1;
+    gap: 24px;
+  }
+
+  .hero-text { flex: 1.2; }
+
+  .hero-text h1 {
+    font-family: 'Bebas Neue', cursive;
+    font-size: clamp(42px, 12vw, 68px);
+    line-height: 0.9;
+    letter-spacing: -1px;
+    color: var(--black);
+    margin-bottom: 10px;
+  }
+  .hero-text h1 span { color: var(--orange); }
+
+  .hero-text p {
+    font-size: 14px;
+    font-weight: 600;
+    color: #555;
+    line-height: 1.5;
+    max-width: 280px;
+  }
+
+  .hero-img-wrap {
+    flex: 1;
+    position: relative;
+    display: flex;
+    justify-content: flex-end;
+    animation: float 4s ease-in-out infinite;
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
+  }
+
+  .bike-circle {
+    position: absolute;
+    right: -20px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,95,0,0.12) 0%, transparent 70%);
+    z-index: -1;
+  }
+
+  /* ── STATS STRIP ─────────────────────── */
+  .stats-strip {
+    display: flex;
+    justify-content: space-around;
+    background: var(--white);
+    margin: 0 20px 24px;
+    padding: 16px 10px;
+    border-radius: 20px;
+    border: 1px solid var(--gray-border);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    animation: fadeUp .5s .35s ease both;
+  }
+  .stat-item {
+    flex: 1;
+    text-align: center;
+    padding: 14px 8px;
+    position: relative;
+    color: var(--black);
+  }
+  .stat-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    right: 0; top: 20%; height: 60%;
+    width: 1px;
+    background: var(--gray-border);
+  }
+  .stat-num {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 24px;
+    line-height: 1;
+    letter-spacing: .5px;
+    color: var(--orange);
+  }
+  .stat-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: #888;
+    letter-spacing: .5px;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  /* ── BOOKING CARD ────────────────────── */
+  .booking-section {
+    padding: 10px 20px 0;
+    animation: fadeUp .5s .45s ease both;
+  }
+
+  .section-title {
+    font-size: 17px;
+    font-weight: 900;
+    color: var(--black);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-title span {
+    color: var(--orange);
+  }
+
+  .location-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 20px;
+    background: var(--white);
+    border-radius: 16px;
+    border: 1px solid var(--gray-border);
+    margin-bottom: 12px;
+    position: relative;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+  }
+  .location-row:hover {
+    border-color: var(--orange-light);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.05);
+  }
+  /* Separator removed for integrated look */
+
+  .dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    box-shadow: 0 0 0 4px rgba(0,0,0,.08);
+  }
+  .dot.pickup { background: #22c55e; box-shadow: 0 0 0 4px rgba(34,197,94,.15); }
+  .dot.drop   { background: var(--orange); box-shadow: 0 0 0 4px rgba(240,90,0,.15); }
+
+  .connector-line {
+    position: absolute;
+    left: 27px;
+    top: 36px;
+    bottom: -32px;
+    width: 2px;
+    background: repeating-linear-gradient(to bottom, #ddd 0, #ddd 4px, transparent 4px, transparent 8px);
+    z-index: 0;
+  }
+
+  .location-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-family: 'Nunito', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--black);
+    background: transparent;
+    caret-color: var(--orange);
+  }
+  .location-input::placeholder { color: #bbb; font-weight: 600; }
+
+  .location-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: var(--gray-bg);
+    color: #666;
+    border: 1px solid var(--gray-border);
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .location-icon:hover { 
+    background: var(--white);
+    color: var(--orange);
+    border-color: var(--orange-light);
+    box-shadow: var(--shadow-sm);
+  }
+
+  /* swap button */
+  .swap-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--white);
+    border: 1px solid var(--gray-border);
+    color: var(--orange);
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    transition: all .3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 2;
+  }
+  .swap-btn:hover { 
+    transform: rotate(180deg) scale(1.1);
+    border-color: var(--orange-light);
+    box-shadow: 0 4px 12px rgba(255,95,0,0.15);
+  }
+
+  .booking-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    background: var(--gray);
+    border-top: 1.5px solid var(--gray2);
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .quick-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--white);
+    border: 1.5px solid var(--gray2);
+    border-radius: 100px;
+    padding: 5px 12px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--black);
+    cursor: pointer;
+    transition: border-color .2s, color .2s;
+  }
+  .quick-tag:hover { border-color: var(--orange); color: var(--orange); }
+
+  .clear-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-muted);
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: color .2s;
+  }
+  .clear-btn:hover { color: var(--orange); }
+
+  /* ── CTA BUTTON ──────────────────────── */
+  .cta-wrap {
+    padding: 22px 20px 0;
+    animation: fadeUp .5s .55s ease both;
+  }
+
+  .cta-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    background: var(--orange);
+    color: var(--white);
+    border: none;
+    border-radius: 18px;
+    padding: 20px 24px;
+    font-family: 'Bebas Neue', cursive;
+    font-size: 22px;
+    letter-spacing: 1.5px;
+    cursor: pointer;
+    box-shadow: 0 8px 28px rgba(240,90,0,.40);
+    transition: transform .15s, box-shadow .15s, background .15s;
+    position: relative;
+    overflow: hidden;
+  }
+  .cta-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,.12) 50%, transparent 100%);
+    transform: translateX(-100%);
+    transition: transform .5s;
+  }
+  .cta-btn:hover::before { transform: translateX(100%); }
+  .cta-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 36px rgba(240,90,0,.50); background: var(--orange-light); }
+  .cta-btn:active { transform: translateY(0); }
+
+  .cta-arrow {
+    background: rgba(255,255,255,.22);
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* ── FEATURES ────────────────────────── */
+  .features {
+    padding: 32px 20px 0;
+    animation: fadeUp .5s .65s ease both;
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .feature-card {
+    background: var(--gray);
+    border-radius: 16px;
+    padding: 18px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    border: 1.5px solid transparent;
+    transition: border-color .2s, transform .2s, box-shadow .2s;
+    cursor: default;
+  }
+  .feature-card:hover {
+    border-color: var(--orange);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(240,90,0,.12);
+  }
+  .feature-icon {
+    width: 40px; height: 40px;
+    border-radius: 12px;
+    background: var(--orange);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .feature-icon svg { color: white; }
+  .feature-name {
+    font-size: 13px;
+    font-weight: 900;
+    color: var(--black);
+    line-height: 1.3;
+  }
+  .feature-desc {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  /* wide feature card */
+  .feature-card.wide {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    align-items: center;
+    gap: 16px;
+  }
+  .feature-card.wide .feature-icon { flex-shrink: 0; }
+
+  /* ── HOW IT WORKS ────────────────────── */
+  .how {
+    padding: 32px 20px 0;
+    animation: fadeUp .5s .75s ease both;
+  }
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    position: relative;
+  }
+  .steps::before {
+    content: '';
+    position: absolute;
+    left: 19px;
+    top: 20px;
+    bottom: 20px;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--orange), #FFD5B8);
+    border-radius: 2px;
+    z-index: 0;
+  }
+  .step {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 16px 0;
+    position: relative;
+    z-index: 1;
+  }
+  .step-num {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: var(--orange);
+    color: var(--white);
+    font-family: 'Bebas Neue', cursive;
+    font-size: 18px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(240,90,0,.30);
+  }
+  .step-body {}
+  .step-title { font-size: 14px; font-weight: 900; margin-bottom: 3px; }
+  .step-desc { font-size: 12px; font-weight: 600; color: var(--text-muted); line-height: 1.5; }
+
+  /* ── TESTIMONIAL ─────────────────────── */
+  .testimonial {
+    margin: 32px 20px 0;
+    background: var(--black);
+    border-radius: 20px;
+    padding: 24px 20px;
+    color: var(--white);
+    position: relative;
+    overflow: hidden;
+    animation: fadeUp .5s .85s ease both;
+  }
+  .testimonial::before {
+    content: '"';
+    position: absolute;
+    top: -10px; right: 16px;
+    font-family: 'Bebas Neue', cursive;
+    font-size: 120px;
+    color: rgba(240,90,0,.20);
+    line-height: 1;
+    pointer-events: none;
+  }
+  .t-stars { color: var(--orange); font-size: 16px; margin-bottom: 10px; letter-spacing: 2px; }
+  .t-text { font-size: 14px; font-weight: 600; line-height: 1.7; opacity: .9; }
+  .t-author { margin-top: 14px; display: flex; align-items: center; gap: 10px; }
+  .t-avatar {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--orange);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Bebas Neue', cursive; font-size: 18px;
+  }
+  .t-name { font-size: 13px; font-weight: 800; }
+  .t-sub { font-size: 11px; opacity: .6; font-weight: 600; }
+
+  /* ── BOTTOM NAV ──────────────────────── */
+  .bottom-nav {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    margin: 0 auto !important;
+    width: 100% !important;
+    max-width: 420px !important;
+    height: 70px;
+    z-index: 99999;
+    display: flex;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(0,0,0,0.08);
+    box-shadow: 0 -5px 25px rgba(0,0,0,0.06);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 12px 8px 10px;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-muted);
+    border: none;
+    background: none;
+    transition: color .2s;
+    font-family: 'Nunito', sans-serif;
+  }
+  .nav-item.active { color: var(--orange); }
+  .nav-item svg { transition: transform .2s; }
+  .nav-item:hover svg { transform: translateY(-2px); }
+  .nav-active-bar {
+    position: absolute;
+    top: 0;
+    height: 3px;
+    width: 40px;
+    background: var(--orange);
+    border-radius: 0 0 4px 4px;
+    left: calc(12.5% - 20px);
+    border-radius: 0 0 6px 6px;
+    transition: left .3s cubic-bezier(.22,1,.36,1);
+  }
+
+  /* ── SPACER ──────────────────────────── */
+  .spacer { height: 80px; }
+
+  /* ── ANIMATIONS ──────────────────────── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes rideIn {
+    from { opacity: 0; transform: translateX(40px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+  @keyframes pulse {
+    0%,100% { box-shadow: 0 0 0 4px rgba(240,90,0,.15); }
+    50%      { box-shadow: 0 0 0 8px rgba(240,90,0,.08); }
+  }
+  .dot.pickup { animation: pulseGreen 2s infinite; }
+  .dot.drop   { animation: pulseOrange 2s infinite; }
+  @keyframes pulseGreen {
+    0%,100% { box-shadow: 0 0 0 4px rgba(34,197,94,.15); }
+    50%      { box-shadow: 0 0 0 8px rgba(34,197,94,.06); }
+  }
+  @keyframes pulseOrange {
+    0%,100% { box-shadow: 0 0 0 4px rgba(240,90,0,.18); }
+    50%      { box-shadow: 0 0 0 8px rgba(240,90,0,.07); }
+  }
+
+  /* desktop centering */
+  @media (min-width: 480px) {
+    body { 
+      background: #f0f2f5; 
+      display: block; 
+    }
+    .wrapper {
+      background: var(--white);
+      max-width: 420px;
+      width: 100%;
+      margin: 0 auto;
+      min-height: 100vh;
+      position: relative;
+      box-shadow: 0 0 50px rgba(0,0,0,0.08);
+      padding-bottom: 90px; /* Space for the fixed bottom nav */
+    }
+  }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <!-- NAVBAR -->
+  <nav class="top-nav">
+    <div class="logo">
+      <span class="easy">Easy</span><span class="find">Find</span><span class="ride">Ride</span>
+    </div>
+    <button class="support-btn" onclick="alert('Connecting to support…')">
+      <!-- headset icon -->
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 18v-6a9 9 0 0 1 18 0v6"/>
+        <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3z"/>
+        <path d="M3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>
+      </svg>
+      Support
+    </button>
+  </nav>
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-badge">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1l9 4v6c0 5.55-3.84 10.74-9 12-5.16-1.26-9-6.45-9-12V5l9-4z"/></svg>
+      Fast &amp; Safe Rides
+    </div>
+    <div class="hero-layout">
+      <div class="hero-text">
+        <h1><span>Where</span><br>would you<br>like to<br><span>go?</span></h1>
+        <p>Book your ride with a smooth, colorful &amp; professional experience.</p>
+      </div>
+      <div class="hero-img-wrap">
+        <div class="bike-circle"></div>
+        <!-- Local Image 11.jpg -->
+        <img src="11.jpg" 
+             alt="Superbike" 
+             class="hero-img" 
+             style="width: 100%; max-width: 420px; filter: drop-shadow(0 20px 40px rgba(0,0,0,0.1)); transition: transform 0.3s ease;">
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- BOOKING CARD -->
+  <div class="booking-section">
+    <div class="section-title">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="var(--orange)"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+      Book <span>Your Ride</span>
+    </div>
+
+    <!-- Integrated Inputs (No Container Card) -->
+    <!-- PICKUP -->
+    <div class="location-row" style="position:relative;">
+      <div class="dot pickup"></div>
+      <div class="connector-line"></div>
+      <input class="location-input" type="text" placeholder="Enter pickup location…" id="pickup" />
+      <!-- Location icon removed for cleaner look -->
+    </div>
+
+    <!-- SWAP ROW -->
+    <div style="display:flex; justify-content:flex-end; padding:0 14px; margin: -16px 0; position:relative; z-index:10;">
+      <button class="swap-btn" title="Swap locations" onclick="swapLocations()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M7 16V4M7 4L3 8M7 4L11 8M17 8V20M17 20L13 16M17 20L21 16"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- DROP -->
+    <div class="location-row">
+      <div class="dot drop"></div>
+      <input class="location-input" type="text" placeholder="Enter drop location…" id="drop" />
+      <!-- Location icon removed for cleaner look -->
+    </div>
+
+    <!-- FOOTER -->
+    <div class="booking-footer" style="background:transparent; border:none; padding: 4px 10px;">
+      <button class="quick-tag" onclick="fillLocation('pickup','Home – Sector 12')">🏠 Home</button>
+      <button class="quick-tag" onclick="fillLocation('drop','Office – MG Road')">🏢 Office</button>
+      <button class="clear-btn" onclick="clearFields()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+        Clear
+      </button>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-wrap">
+    <button class="cta-btn" onclick="getVehicles()">
+      Get Vehicles &amp; Prices
+      <div class="cta-arrow">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </div>
+    </button>
+  </div>
+
+  <!-- STATS (Relocated) -->
+  <div style="padding: 0 0; animation: fadeUp .5s .35s ease both;">
+    <div class="stats-strip">
+      <div class="stat-item">
+        <div class="stat-num">50K+</div>
+        <div class="stat-label">Rides</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">4.9★</div>
+        <div class="stat-label">Rating</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">2Min</div>
+        <div class="stat-label">Pickup</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FEATURES -->
+  <div class="features">
+    <div class="section-title">Why <span>EasyFindRide?</span></div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1l9 4v6c0 5.55-3.84 10.74-9 12-5.16-1.26-9-6.45-9-12V5l9-4z"/></svg>
+        </div>
+        <div class="feature-name">100% Safe Rides</div>
+        <div class="feature-desc">Verified drivers with background checks</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <div class="feature-name">2-Min Pickup</div>
+        <div class="feature-desc">Nearest rider reaches you fast</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        </div>
+        <div class="feature-name">Best Fare</div>
+        <div class="feature-desc">Transparent pricing, no surge</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        </div>
+        <div class="feature-name">Live Tracking</div>
+        <div class="feature-desc">Track your ride in real-time</div>
+      </div>
+      <div class="feature-card wide">
+        <div class="feature-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.5 2 2 0 0 1 3.6 1.32h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.83a16 16 0 0 0 6 6l.92-.92a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7a2 2 0 0 1 1.72 2.02z"/></svg>
+        </div>
+        <div>
+          <div class="feature-name">24/7 Customer Support</div>
+          <div class="feature-desc">Always here to help — call, chat, or message anytime</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <div class="how">
+    <div class="section-title">How It <span>Works</span></div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Enter Pickup &amp; Drop</div>
+          <div class="step-desc">Type your current location and where you want to go</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Choose Your Vehicle</div>
+          <div class="step-desc">See available bikes, autos &amp; cabs with upfront prices</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Confirm &amp; Ride</div>
+          <div class="step-desc">Book in one tap — your rider arrives in minutes</div>
+        </div>
+      </div>
+        <div style="height: 20px;"></div> <!-- Small padding at the end of content -->
+    </div>
+  </div>
+
+  <!-- TESTIMONIAL -->
+  <div class="testimonial">
+    <div class="t-stars">★★★★★</div>
+    <div class="t-text">"EasyFindRide is my go-to every day. The pickup is lightning fast and I always feel safe. Way better than any other app I've tried!"</div>
+    <div class="t-author">
+      <div class="t-avatar">R</div>
+      <div>
+        <div class="t-name">Rahul M.</div>
+        <div class="t-sub">Daily Commuter · Hyderabad</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="height: 32px;"></div>
+</div> <!-- end wrapper -->
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <div class="nav-active-bar" id="activeBar"></div>
+
+  <button class="nav-item active" id="navHome" onclick="setNav(0)">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+    Home
+  </button>
+  <button class="nav-item" id="navBookings" onclick="setNav(1)">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    My Bookings
+  </button>
+  <button class="nav-item" id="navPenalty" onclick="setNav(2)">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1l9 4v6c0 5.55-3.84 10.74-9 12-5.16-1.26-9-6.45-9-12V5l9-4z"/></svg>
+    Penalty
+  </button>
+  <button class="nav-item" id="navProfile" onclick="setNav(3)">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    Profile
+  </button>
+</nav>
+
+<script>
+  const navItems = ['navHome','navBookings','navPenalty','navProfile'];
+  const bar = document.getElementById('activeBar');
+
+  function setNav(idx) {
+    navItems.forEach((id, i) => {
+      document.getElementById(id).classList.toggle('active', i === idx);
+    });
+    // move bar: each item is 25% wide, center at 12.5% + 25%*idx
+    bar.style.left = `calc(${25 * idx + 12.5}% - 20px)`;
+  }
+
+  function useMyLocation() {
+    if (!navigator.geolocation) { alert('Geolocation not supported'); return; }
+    navigator.geolocation.getCurrentPosition(
+      () => { document.getElementById('pickup').value = 'Current Location'; },
+      () => { document.getElementById('pickup').value = 'Current Location (approx.)'; }
+    );
+  }
+
+  function swapLocations() {
+    const p = document.getElementById('pickup');
+    const d = document.getElementById('drop');
+    [p.value, d.value] = [d.value, p.value];
+  }
+
+  function fillLocation(field, val) {
+    document.getElementById(field).value = val;
+  }
+
+  function clearFields() {
+    document.getElementById('pickup').value = '';
+    document.getElementById('drop').value = '';
+  }
+
+  function getVehicles() {
+    const p = document.getElementById('pickup').value.trim();
+    const d = document.getElementById('drop').value.trim();
+    if (!p || !d) {
+      alert('Please enter both pickup and drop locations.');
+      return;
+    }
+    alert(`Finding vehicles from:\n📍 ${p}\n🎯 ${d}`);
+  }
+</script>
+</body>
+</html>
