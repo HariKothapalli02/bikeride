@@ -399,7 +399,17 @@
   }
   .cta-btn:hover::before { transform: translateX(100%); }
   .cta-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 36px rgba(240,90,0,.50); background: var(--orange-light); }
-  .cta-btn:active { transform: translateY(0); }
+  .cta-btn:active { 
+    transform: translateY(0) scale(0.98); 
+    box-shadow: 0 0 0 4px var(--black); 
+  }
+
+  /* Global active state for all buttons */
+  button:active {
+    box-shadow: 0 0 0 3px rgba(0,0,0,0.8) !important;
+    transform: scale(0.97);
+    transition: all 0.1s;
+  }
 
   .cta-arrow {
     background: rgba(255,255,255,.22);
@@ -481,7 +491,7 @@
     position: absolute;
     left: 19px;
     top: 20px;
-    bottom: 20px;
+    bottom: 36px; /* Adjusted to stop at the center of the last circle */
     width: 2px;
     background: linear-gradient(to bottom, var(--orange), #FFD5B8);
     border-radius: 2px;
@@ -815,6 +825,13 @@
         <div class="step-body">
           <div class="step-title">Confirm &amp; Ride</div>
           <div class="step-desc">Book in one tap — your rider arrives in minutes</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <div class="step-title">Enjoy Safe Ride</div>
+          <div class="step-desc">Sit back and enjoy your comfortable and safe journey</div>
         </div>
       </div>
         <div style="height: 20px;"></div> <!-- Small padding at the end of content -->
